@@ -1,19 +1,39 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import util.Util;
 
-public class Adocao {
+@Entity
+@Table(name = "adocoes")
+public class Adocao implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "adocao_id")
     private int id;
-    private final LocalDate dataSolicitacao;
-    private String status;
+
+    @Column(name = "adocao_data_hora", nullable = false)
     private LocalDate dataAdocao;
+
+    @ManyToOne
+    @JoinColumn(name = "adocao_adotante")
     private Adotante adotante;
+
+    @ManyToOne
+    @JoinColumn(name = "adocao_animal")
     private Animal animal;
 
     public Adocao(int id, Adotante adotante, Animal animal) {
         this.id = id;
-        this.dataSolicitacao = LocalDate.now();
-        this.status = "Pendente";
+        this.dataAdocao = LocalDate.now();
         this.adotante = adotante;
         this.animal = animal;
     }
@@ -24,14 +44,6 @@ public class Adocao {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public LocalDate getDataAdocao() {
@@ -57,7 +69,17 @@ public class Adocao {
     public void setAnimal(Animal animal) {
         this.animal = animal;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return Util.formatarDataHora(dataAdocao);
+    }
+
+    public String exibirDados() {
+        String aux = "Dados da Adocao:\n";
+        aux += "Data|Hora:" + Util.formatarDataHora(dataAdocao) + "\n";
+        aux += "Veiculo" + getAdotante().getNome() + "\n";
+        aux += "Cliente: " + getAnimal().getNome() + "\n";
+        return aux;
+    }
 }

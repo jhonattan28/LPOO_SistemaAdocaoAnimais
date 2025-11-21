@@ -1,29 +1,47 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
-public class Adotante {
+@Entity
+@Table(name = "adotantes")
+public class Adotante implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "adotante_id")
     private int id;
-    private String nome;
-    private String cpf;
-    private LocalDate dataNascimento;
-    private String endereco;
-    private final List<Adocao> historicoAdocoes;
-    private TipoMoradia tipoMoradia;
-    private boolean ambienteCalmo;
 
-    public Adotante(int id, String nome, String cpf, LocalDate dataNascimento, String endereco, TipoMoradia tipoMoradia, boolean ambienteCalmo) {
+    @Column(name = "adotante_nome", nullable = false)
+    private String nome;
+
+    @Column(name = "adotante_cpf", nullable = false)
+    private String cpf;
+
+    @Column(name = "adotante_dataNascimento", nullable = false)
+    private LocalDate dataNascimento;
+
+    @Column(name = "adotante_endereco")
+    private String endereco;
+
+    @Column(name = "adotante_telefone")
+    private String telefone;
+
+    public Adotante(int id, String nome, String cpf, LocalDate dataNascimento, String endereco, String telefone) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
         this.dataNascimento = dataNascimento;
         this.endereco = endereco;
-        this.historicoAdocoes = new ArrayList<>();
-        this.tipoMoradia = tipoMoradia;
-        this.ambienteCalmo = ambienteCalmo;
+        this.telefone = telefone;
     }
 
     public int getId() {
@@ -66,21 +84,32 @@ public class Adotante {
         this.endereco = endereco;
     }
 
-    public TipoMoradia getTipoMoradia() {
-        return tipoMoradia;
+    public String getTelefone() {
+        return telefone;
     }
 
-    public void setTipoMoradia(TipoMoradia tipoMoradia) {
-        this.tipoMoradia = tipoMoradia;
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 
-    public boolean isAmbienteCalmo() {
-        return ambienteCalmo;
+    public String exibirDados() {
+        String aux = "Adotante cadastrado:\n";
+        aux += "Nome: " + nome + "\n";
+        aux += "Cpf: " + cpf + "\n";
+        aux += "Data de Nascimento: " + dataNascimento + "\n";
+        aux += "Endereço: " + endereco + "\n";
+        aux += "Telefone: " + telefone + "\n";
+        return aux;
     }
 
-    public void setAmbienteCalmo(boolean ambienteCalmo) {
-        this.ambienteCalmo = ambienteCalmo;
+    @OneToMany(mappedBy = "adotante")
+    private List<Adocao> adocoes;
+
+    public List<Adocao> getAdocoes() {
+        return adocoes;
     }
-    
-    
+
+    public void setAdocoes(List<Adocao> adocoes) {
+        this.adocoes = adocoes;
+    }
 }

@@ -4,15 +4,15 @@ import config.PersistenciaJPA;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import model.Adocao;
+import model.Animal;
 
-public class AdocaoDAO extends PersistenciaJPA {
+public class AnimalDAO extends PersistenciaJPA {
 
-    public List<Adocao> listaAdocoes() {
+    public List<Animal> listaAnimais() {
         EntityManager em = getEntityManager();
         try {
-            TypedQuery<Adocao> query
-                    = em.createQuery("SELECT v FROM Adocao v", Adocao.class);
+            TypedQuery<Animal> query
+                    = em.createQuery("SELECT v FROM Animal v", Animal.class);
             return query.getResultList();
         } catch (Exception e) {
             e.printStackTrace();

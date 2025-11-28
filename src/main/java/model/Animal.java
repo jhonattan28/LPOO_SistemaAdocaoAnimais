@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ public class Animal implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "animal_id")
-    private int id;
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "animal_especie")
@@ -38,20 +39,16 @@ public class Animal implements Serializable {
     @Column(name = "animal_disponivel")
     private boolean disponivel;
 
-    public Animal(int id, EspecieAnimal especie, String nome, String idade, GenAnimal sexo, boolean disponivel) {
-        this.id = id;
-        this.especie = especie;
-        this.nome = nome;
-        this.idade = idade;
-        this.sexo = sexo;
-        this.disponivel = disponivel;
+    public Animal() {
+        disponivel = true;
+        adocoes = new ArrayList<>();
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -97,6 +94,11 @@ public class Animal implements Serializable {
 
     public void setEspecie(EspecieAnimal especie) {
         this.especie = especie;
+    }
+
+    @Override
+    public String toString() {
+        return nome;
     }
 
     public String exibirDados() {

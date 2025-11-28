@@ -1,12 +1,42 @@
 package view;
 
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.Adocao;
+import model.Animal;
+import model.dao.AdocaoDAO;
+import model.dao.AnimalDAO;
+
 public class ListaAdocaoJF extends javax.swing.JFrame {
 
-    /**
-     * Creates new form ListaAdocaoJF
-     */
+    AdocaoDAO dao;
+    AnimalDAO anidao;
+
     public ListaAdocaoJF() {
         initComponents();
+        dao = new AdocaoDAO();
+        anidao = new AnimalDAO();
+        loadAdocoes();
+    }
+
+    public void loadAdocoes() {
+        DefaultTableModel modelo = (DefaultTableModel) tblAdocoes.getModel();
+        modelo.setNumRows(0);
+        for (Adocao obj : dao.listaAdocoes()) {
+            Animal animal = obj.getAnimal();
+
+            String especie = (animal != null) ? animal.getEspecie().toString() : "N/A";
+            String nomeAnimal = (animal != null) ? animal.getNome() : "Animal Removido";
+
+            Object[] linha = {
+                obj,
+                nomeAnimal,
+                especie,
+                obj.getAdotante()
+            };
+            modelo.addRow(linha);
+        }
+
     }
 
     /**
@@ -18,21 +48,176 @@ public class ListaAdocaoJF extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblAdocoes = new javax.swing.JTable();
+        btnNovo = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnRemover = new javax.swing.JButton();
+        btnInfo = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jLabel1.setText("Adoções Registradas");
+
+        tblAdocoes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Data", "Nome (Animal)", "Espécie", "Adotante"
+            }
+        ));
+        jScrollPane1.setViewportView(tblAdocoes);
+
+        btnNovo.setText("Novo");
+        btnNovo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNovoActionPerformed(evt);
+            }
+        });
+
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+
+        btnRemover.setText("Remover");
+        btnRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverActionPerformed(evt);
+            }
+        });
+
+        btnInfo.setText("Mais Informações");
+        btnInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInfoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnNovo)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnEditar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnRemover)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnInfo)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNovo)
+                    .addComponent(btnEditar)
+                    .addComponent(btnRemover)
+                    .addComponent(btnInfo))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
+
+        // 1. Abrir a aplicação CadastroVendaJD
+        CadastroAdocaoJD telaVenda = new CadastroAdocaoJD(this, rootPaneCheckingEnabled);
+        telaVenda.setVisible(true);
+
+        // 2. recuperar o objeto Venda
+        Adocao novoObj = telaVenda.getAdocao();
+        Animal animalAtualizado = novoObj.getAnimal();
+
+        // 3. Se o objeto não for null persistir no BD
+        if (novoObj != null) {
+            try {
+                dao.persist(novoObj);
+                anidao.persist(animalAtualizado);
+                loadAdocoes();
+            } catch (Exception ex) {
+                System.err.println("Erro ao registrar nova adoção: " + novoObj + "\n Erro: " + ex);
+            }
+
+        }
+    }//GEN-LAST:event_btnNovoActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        if (tblAdocoes.getSelectedRow() != -1) {
+            Adocao obj = (Adocao) tblAdocoes.getModel().getValueAt(tblAdocoes.getSelectedRow(), 0);
+            CadastroAdocaoJD telaAdocao = new CadastroAdocaoJD(this, rootPaneCheckingEnabled);
+            telaAdocao.setAdocao(obj);
+            telaAdocao.setVisible(true);
+
+            Adocao AdocaoEdt = telaAdocao.getAdocao();
+
+            if (AdocaoEdt != null) {
+                try {
+                    dao.persist(AdocaoEdt);
+                } catch (Exception ex) {
+                    System.err.println("Erro ao editar Adocao\n Erro: " + ex);
+                }
+                loadAdocoes();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverActionPerformed
+        if (tblAdocoes.getSelectedRow() != -1) {
+            Adocao obj = (Adocao) tblAdocoes.getModel().getValueAt(tblAdocoes.getSelectedRow(), 0);
+            Animal animal = obj.getAnimal();
+            String txtAdocao = "Adoção: { Animal: " + obj.getAnimal().getNome() + ", Adotante: " + obj.getAdotante().getNome() + "}";
+            int op_remover = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que deseja remover " + txtAdocao + "?");
+            if (op_remover == JOptionPane.YES_OPTION) {
+                try {
+                    dao.remover(obj);
+                    animal.setDisponivel(true);
+                    anidao.persist(animal);
+                } catch (Exception ex) {
+                    System.out.println("Erro ao remover " + txtAdocao + "\n Erro: " + ex);
+                }
+                JOptionPane.showMessageDialog(rootPane, "Adoção removida com sucesso... ");
+                loadAdocoes();
+            }
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnRemoverActionPerformed
+
+    private void btnInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInfoActionPerformed
+        if (tblAdocoes.getSelectedRow() != -1) {
+            Adocao obj = (Adocao) tblAdocoes.getModel().getValueAt(tblAdocoes.getSelectedRow(), 0);
+            JOptionPane.showMessageDialog(rootPane, obj.exibirDados());
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnInfoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -70,5 +255,12 @@ public class ListaAdocaoJF extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnInfo;
+    private javax.swing.JButton btnNovo;
+    private javax.swing.JButton btnRemover;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblAdocoes;
     // End of variables declaration//GEN-END:variables
 }

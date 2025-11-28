@@ -2,6 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,7 +19,7 @@ public class Adocao implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "adocao_id")
-    private int id;
+    private Integer id;
 
     @Column(name = "adocao_data_hora", nullable = false)
     private LocalDate dataAdocao;
@@ -31,14 +32,7 @@ public class Adocao implements Serializable {
     @JoinColumn(name = "adocao_animal")
     private Animal animal;
 
-    public Adocao(int id, Adotante adotante, Animal animal) {
-        this.id = id;
-        this.dataAdocao = LocalDate.now();
-        this.adotante = adotante;
-        this.animal = animal;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -77,9 +71,9 @@ public class Adocao implements Serializable {
 
     public String exibirDados() {
         String aux = "Dados da Adocao:\n";
-        aux += "Data|Hora:" + Util.formatarDataHora(dataAdocao) + "\n";
-        aux += "Veiculo" + getAdotante().getNome() + "\n";
-        aux += "Cliente: " + getAnimal().getNome() + "\n";
+        aux += "Data|Hora: " + Util.formatarDataHora(dataAdocao) + "\n";
+        aux += "Adotante: " + getAdotante().getNome() + "\n";
+        aux += "Animal: " + getAnimal().getNome() + "\n";
         return aux;
     }
 }

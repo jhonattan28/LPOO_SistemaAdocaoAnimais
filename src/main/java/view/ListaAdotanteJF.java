@@ -1,12 +1,22 @@
 package view;
 
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.Adotante;
+import model.dao.AdotanteDAO;
+
 public class ListaAdotanteJF extends javax.swing.JFrame {
+
+    AdotanteDAO dao;
 
     /**
      * Creates new form ListaAdotanteJF
      */
     public ListaAdotanteJF() {
         initComponents();
+        dao = new AdotanteDAO();
+
+        loadTabelaAdotantes();
     }
 
     /**
@@ -18,21 +28,165 @@ public class ListaAdotanteJF extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblAdotantes = new javax.swing.JTable();
+        btnNovo = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnRemover = new javax.swing.JButton();
+        btnInfo = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jLabel1.setText("Adotantes Cadastrados");
+
+        tblAdotantes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Nome", "Cpf", "Telefone"
+            }
+        ));
+        jScrollPane1.setViewportView(tblAdotantes);
+
+        btnNovo.setText("Novo");
+        btnNovo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNovoActionPerformed(evt);
+            }
+        });
+
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+
+        btnRemover.setText("Remover");
+        btnRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverActionPerformed(evt);
+            }
+        });
+
+        btnInfo.setText("Mais Informações");
+        btnInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInfoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnNovo)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnEditar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnRemover)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnInfo)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNovo)
+                    .addComponent(btnEditar)
+                    .addComponent(btnRemover)
+                    .addComponent(btnInfo))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
+        CadastroAdotanteJD telaCadastro = new CadastroAdotanteJD(this, rootPaneCheckingEnabled);
+        telaCadastro.setVisible(true);
+
+        Adotante novoAdotante = telaCadastro.getAdotante();
+        if (novoAdotante != null) {
+            try {
+                dao.persist(novoAdotante);
+                loadTabelaAdotantes();
+            } catch (Exception ex) {
+                System.out.println("Erro ao cadastrar o adotante " + novoAdotante.toString() + " \n Erro: " + ex);
+            }
+        }
+    }//GEN-LAST:event_btnNovoActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        if (tblAdotantes.getSelectedRow() != -1) {
+            Adotante obj = (Adotante) tblAdotantes.getModel().getValueAt(tblAdotantes.getSelectedRow(), 0);
+            CadastroAdotanteJD telaAdotante = new CadastroAdotanteJD(this, rootPaneCheckingEnabled);
+            telaAdotante.setAdotante(obj);
+            telaAdotante.setVisible(true);
+
+            Adotante AdotanteEdt = telaAdotante.getAdotante();
+
+            if (AdotanteEdt != null) {
+                try {
+                    dao.persist(AdotanteEdt);
+                } catch (Exception ex) {
+                    System.err.println("Erro ao editar Adotante\n Erro: " + ex);
+                }
+                loadTabelaAdotantes();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverActionPerformed
+        if (tblAdotantes.getSelectedRow() != -1) {
+            Adotante obj = (Adotante) tblAdotantes.getModel().getValueAt(tblAdotantes.getSelectedRow(), 0);
+            String txtAdotante = "Adotante: { Nome: " + obj.getNome() + ", Cpf: " + obj.getCpf() + "}";
+            int op_remover = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que deseja remover " + txtAdotante + "?");
+            if (op_remover == JOptionPane.YES_OPTION) {
+                try {
+                    dao.remover(obj);
+                } catch (Exception ex) {
+                    System.out.println("Erro ao remover " + txtAdotante + "\n Erro: " + ex);
+                }
+                JOptionPane.showMessageDialog(rootPane, "Adoção removida com sucesso... ");
+                loadTabelaAdotantes();
+            }
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnRemoverActionPerformed
+
+    private void btnInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInfoActionPerformed
+        if (tblAdotantes.getSelectedRow() != -1) {
+            Adotante obj = (Adotante) tblAdotantes.getModel().getValueAt(tblAdotantes.getSelectedRow(), 0);
+            JOptionPane.showMessageDialog(rootPane, obj.exibirDados());
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnInfoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -69,6 +223,28 @@ public class ListaAdotanteJF extends javax.swing.JFrame {
         });
     }
 
+    public void loadTabelaAdotantes() {
+        DefaultTableModel modelo = (DefaultTableModel) tblAdotantes.getModel();
+        modelo.setNumRows(0);
+
+        for (Adotante obj : dao.listaAdotantes()) {
+            Object[] linha = {
+                obj,
+                obj.getCpf(),
+                obj.getTelefone()
+            };
+            modelo.addRow(linha);
+        }
+
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnInfo;
+    private javax.swing.JButton btnNovo;
+    private javax.swing.JButton btnRemover;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblAdotantes;
     // End of variables declaration//GEN-END:variables
 }

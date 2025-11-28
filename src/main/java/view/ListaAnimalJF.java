@@ -1,12 +1,24 @@
 package view;
 
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import model.Animal;
+import model.dao.AnimalDAO;
+
 public class ListaAnimalJF extends javax.swing.JFrame {
 
+    AnimalDAO dao;
+    
     /**
      * Creates new form ListaAnimalJF
      */
     public ListaAnimalJF() {
         initComponents();
+        
+        dao = new AnimalDAO();
+                
+        loadTabelaAnimais();
+        
     }
 
     /**
@@ -18,21 +30,174 @@ public class ListaAnimalJF extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblAnimais = new javax.swing.JTable();
+        btnNovo = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        bntRemover = new javax.swing.JButton();
+        btnInfo = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jLabel1.setText("Animais Cadastrados");
+
+        tblAnimais.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Nome", "Espécie", "Idade", "Disponível"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblAnimais);
+
+        btnNovo.setText("Novo");
+        btnNovo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNovoActionPerformed(evt);
+            }
+        });
+
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+
+        bntRemover.setText("Remover");
+        bntRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bntRemoverActionPerformed(evt);
+            }
+        });
+
+        btnInfo.setText("Mais Informações");
+        btnInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInfoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnNovo)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnEditar)
+                                .addGap(18, 18, 18)
+                                .addComponent(bntRemover)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnInfo)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNovo)
+                    .addComponent(btnEditar)
+                    .addComponent(bntRemover)
+                    .addComponent(btnInfo))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
+        CadastroAnimalJD telaCadastro = new CadastroAnimalJD(this, rootPaneCheckingEnabled);
+        telaCadastro.setVisible(true);
+
+        Animal novoAnimal = telaCadastro.getAnimal();
+        if (novoAnimal != null) {
+            try {
+                novoAnimal.setDisponivel(true);
+                dao.persist(novoAnimal);
+                loadTabelaAnimais();
+            } catch (Exception ex) {
+                System.out.println("Erro ao cadastrar o animal " + novoAnimal.toString() + " \n Erro: " + ex);
+            }
+        }
+    }//GEN-LAST:event_btnNovoActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        if (tblAnimais.getSelectedRow() != -1) {
+            Animal obj = (Animal) tblAnimais.getModel().getValueAt(tblAnimais.getSelectedRow(), 0);
+            CadastroAnimalJD telaAnimal = new CadastroAnimalJD(this, rootPaneCheckingEnabled);
+            telaAnimal.setAnimal(obj);
+            telaAnimal.setVisible(true);
+
+            Animal AnimalEdt = telaAnimal.getAnimal();
+
+            if (AnimalEdt != null) {
+                try {
+                    dao.persist(AnimalEdt);
+                } catch (Exception ex) {
+                    System.err.println("Erro ao editar Animal\n Erro: " + ex);
+                }
+                loadTabelaAnimais();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void bntRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntRemoverActionPerformed
+        if (tblAnimais.getSelectedRow() != -1) {
+            Animal obj = (Animal) tblAnimais.getModel().getValueAt(tblAnimais.getSelectedRow(), 0);
+            String txtAnimal = "Animal: { Nome: " + obj.getNome() + ", Espécie: " + obj.getEspecie() + "}";
+            int op_remover = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que deseja remover " + txtAnimal + "?");
+            if (op_remover == JOptionPane.YES_OPTION) {
+                try {
+                    dao.remover(obj);
+                } catch (Exception ex) {
+                    System.out.println("Erro ao remover " + txtAnimal + "\n Erro: " + ex);
+                }
+                JOptionPane.showMessageDialog(rootPane, "Adoção removida com sucesso... ");
+                loadTabelaAnimais();
+            }
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_bntRemoverActionPerformed
+
+    private void btnInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInfoActionPerformed
+        if (tblAnimais.getSelectedRow() != -1) {
+            Animal obj = (Animal) tblAnimais.getModel().getValueAt(tblAnimais.getSelectedRow(), 0);
+            JOptionPane.showMessageDialog(rootPane, obj.exibirDados());
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Selecione uma linha");
+        }
+    }//GEN-LAST:event_btnInfoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -69,6 +234,29 @@ public class ListaAnimalJF extends javax.swing.JFrame {
         });
     }
 
+        public void loadTabelaAnimais() {
+        DefaultTableModel modelo = (DefaultTableModel) tblAnimais.getModel();
+        modelo.setNumRows(0);
+
+        for (Animal obj : dao.listaAnimais()) {
+            Object[] linha = {
+                obj,
+                obj.getEspecie(),
+                obj.getIdade(),
+                obj.isDisponivel()
+            };
+            modelo.addRow(linha);
+        }
+
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bntRemover;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnInfo;
+    private javax.swing.JButton btnNovo;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblAnimais;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,6 +1,26 @@
 package view;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import javax.swing.JOptionPane;
+import model.Adocao;
+import model.Adotante;
+import model.Animal;
+import model.EspecieAnimal;
+import model.dao.AnimalDAO;
+import model.dao.AdotanteDAO;
+
 public class CadastroAdocaoJD extends javax.swing.JDialog {
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    AnimalDAO daoAnimal;
+    AdotanteDAO daoAdotante;
+
+    private Adocao adocao;
 
     /**
      * Creates new form CadastroAdocaoJD
@@ -8,6 +28,56 @@ public class CadastroAdocaoJD extends javax.swing.JDialog {
     public CadastroAdocaoJD(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+
+        daoAnimal = new AnimalDAO();
+        daoAdotante = new AdotanteDAO();
+
+        loadEspecies();
+        loadAdotantes();
+        loadAnimais();
+
+        cmbEspecie.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filtrarAnimais(); // Chama o método de filtragem
+            }
+        });
+        filtrarAnimais();
+
+        txtDataAdo.setText(LocalDateTime.now().format(formatter));
+    }
+
+    public void loadEspecies() {
+        for (EspecieAnimal obj : EspecieAnimal.values()) {
+            cmbEspecie.addItem(obj);
+        }
+    }
+
+    public void loadAdotantes() {
+        for (Adotante obj : daoAdotante.listaAdotantes()) {
+            cmbAdotante.addItem(obj);
+        }
+    }
+
+    public void loadAnimais() {
+        for (Animal obj : daoAnimal.listaAnimais()) {
+            cmbAnimal.addItem(obj);
+        }
+    }
+
+    private void filtrarAnimais() {
+        cmbAnimal.removeAllItems();
+
+        EspecieAnimal especieSelecionada = (EspecieAnimal) cmbEspecie.getSelectedItem();
+
+        if (especieSelecionada != null) {
+            List<Animal> animaisDisponiveis = daoAnimal.buscarAnimaisDisponiveisPorEspecie(especieSelecionada);
+
+            for (Animal animal : animaisDisponiveis) {
+                cmbAnimal.addItem(animal);
+            }
+        }
+
+        cmbAnimal.setSelectedIndex(-1);
     }
 
     /**
@@ -24,12 +94,12 @@ public class CadastroAdocaoJD extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jComboBox3 = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        txtDataAdo = new javax.swing.JTextField();
+        cmbAdotante = new javax.swing.JComboBox<>();
+        cmbEspecie = new javax.swing.JComboBox<>();
+        cmbAnimal = new javax.swing.JComboBox<>();
+        btnSalvar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -46,22 +116,19 @@ public class CadastroAdocaoJD extends javax.swing.JDialog {
 
         jLabel5.setText("Adotante:");
 
-        jTextField1.setText("jTextField1");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jButton1.setText("Salvar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnSalvar.setText("Salvar");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnSalvarActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Cancelar");
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -75,20 +142,20 @@ public class CadastroAdocaoJD extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnSalvar, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jTextField1)
-                                .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtDataAdo)
+                                .addComponent(cmbAdotante, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cmbEspecie, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cmbAnimal, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(0, 1, Short.MAX_VALUE)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButton2)
+                                .addComponent(btnCancelar)
                                 .addGap(14, 14, 14)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -100,32 +167,82 @@ public class CadastroAdocaoJD extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDataAdo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbAdotante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbEspecie, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbAnimal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(btnSalvar)
+                    .addComponent(btnCancelar))
                 .addGap(18, 18, 18))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+
+        try {
+            if (this.adocao == null) {
+                this.adocao = new Adocao();
+            }
+
+            LocalDate dataAdocao = LocalDate.parse(txtDataAdo.getText(), formatter);
+
+            Animal animalSelecionado;
+
+            boolean isNovoCadastro = (this.adocao.getId() == null || this.adocao.getId() == 0);
+
+            if (isNovoCadastro) {
+                animalSelecionado = (Animal) cmbAnimal.getSelectedItem();
+                if (animalSelecionado == null) {
+                    JOptionPane.showMessageDialog(rootPane, "Selecione um animal para adoção!");
+                    return;
+                }
+                if (!animalSelecionado.isDisponivel()) {
+                    JOptionPane.showMessageDialog(rootPane, "Esse animal não está disponível para adoção!");
+                    return;
+                }
+                animalSelecionado.setDisponivel(false);
+            } else {
+                animalSelecionado = this.adocao.getAnimal();
+                if (animalSelecionado == null) {
+                    JOptionPane.showMessageDialog(rootPane, "Erro: A adoção não possui um animal associado.");
+                    return;
+                }
+            }
+            adocao.setDataAdocao(dataAdocao);
+            adocao.setAdotante((Adotante) cmbAdotante.getSelectedItem());
+            /*if (animalSelecionado != null && !animalSelecionado.isDisponivel()) {
+                JOptionPane.showMessageDialog(rootPane, "Esse animal não está disponível para adoção!");
+                return;
+            } else {*/
+                adocao.setAnimal(animalSelecionado);
+                
+            //}
+            this.dispose();
+        } catch (DateTimeParseException e) {
+            adocao = null;
+            JOptionPane.showMessageDialog(this, "Data inválida. Use o formato: dd-MM-yyyy", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            adocao = null;
+            JOptionPane.showMessageDialog(this, "Erro ao registrar adocao: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -170,16 +287,35 @@ public class CadastroAdocaoJD extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnSalvar;
+    private javax.swing.JComboBox<Adotante> cmbAdotante;
+    private javax.swing.JComboBox<Animal> cmbAnimal;
+    private javax.swing.JComboBox<EspecieAnimal> cmbEspecie;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField txtDataAdo;
     // End of variables declaration//GEN-END:variables
+
+    public Adocao getAdocao() {
+        return this.adocao;
+    }
+
+    public void setAdocao(Adocao adocao) {
+        this.adocao = adocao;
+        txtDataAdo.setText(adocao.getDataAdocao().format(formatter));
+        cmbAdotante.setSelectedItem(adocao.getAdotante());
+        cmbAnimal.setSelectedItem(adocao.getAnimal());
+
+        if (adocao != null && adocao.getId() != null) {
+            cmbAnimal.setEnabled(false);
+            cmbEspecie.setEnabled(false);
+        } else {
+            cmbAnimal.setEnabled(true);
+            cmbEspecie.setEnabled(true);
+        }
+    }
 }

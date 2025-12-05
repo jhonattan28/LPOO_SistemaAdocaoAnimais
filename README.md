@@ -14,4 +14,6 @@ Cada uma das classes com características especiais, e então o Adotante teria d
 
 ---
 
-![Diagrama de classes](./Diagrama SA.jpg)
+# Diagrama de Classes
+
+<img src="Diagrama SA.jpg" alt="Diagrama de classes UML"/>
